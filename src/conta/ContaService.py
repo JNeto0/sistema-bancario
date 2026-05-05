@@ -45,4 +45,18 @@ class ContaService:
 
         return "Débito realizado com sucesso."
     
+    def transferencia(self, numero_origem, numero_destino, valor):
+
+        conta_origem = self.repository.buscar_por_numero(numero_origem)
+
+        conta_destino = self.repository.buscar_por_numero(numero_destino)
+
+        if not conta_origem or not conta_destino:
+            return "Conta não encontrada, verifique o código."
+
+        conta_origem.sacar(valor)
+
+        conta_destino.depositar(valor)
+
+        return "Transferência realizada com sucesso."
     

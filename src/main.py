@@ -13,6 +13,7 @@ def main():
         print("2 - Consultar saldo")
         print("3 - Depositar")
         print("4 - Sacar")
+        print("5 - Transferência")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -58,6 +59,18 @@ def main():
             valor = float(input("Valor do débito: "))
 
             mensagem = service.debito(numero, valor)
+
+            print(mensagem)
+
+        elif opcao == "5":
+
+            origem = input("Conta origem: ")
+
+            destino = input("Conta destino: ")
+
+            valor = float(input("Valor da transferência: "))
+
+            mensagem = service.transferencia(origem, destino, valor)
 
             print(mensagem)
 

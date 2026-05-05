@@ -41,15 +41,15 @@ def main():
 
 
         elif opcao == "3":
-            numero = input("Número da conta: ")
-            valor = float(input("Valor: "))
-            conta = contas.get(numero)
 
-            if conta:
-                conta.depositar(valor)
-                print("Depósito realizado.")
-            else:
-                print("Conta não encontrada.")
+            numero = input("Número da conta: ")
+
+            valor = float(input("Valor do crédito: "))
+
+            mensagem = service.credito(numero, valor)
+
+            print(mensagem)
+
 
         elif opcao == "4":
             numero = input("Número da conta: ")

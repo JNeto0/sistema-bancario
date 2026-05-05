@@ -23,3 +23,16 @@ class ContaService:
 
         return conta.consultar_saldo()
     
+    def credito(self, numero, valor):
+
+        conta = self.repository.buscar_por_numero(numero)
+
+        if not conta:
+            return "Conta não encontrada, verifique o código."
+
+        conta.depositar(valor)
+
+        return "Crédito realizado."
+    
+    
+    

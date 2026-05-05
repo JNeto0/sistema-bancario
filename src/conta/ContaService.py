@@ -14,4 +14,12 @@ class ContaService:
         self.repository.adicionar(conta)
         return conta
     
+    def consultar_saldo(self, numero):
+
+        conta = self.repository.buscar_por_numero(numero)
+
+        if not conta:
+            return None
+
+        return conta.consultar_saldo()
     

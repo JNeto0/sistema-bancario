@@ -27,14 +27,18 @@ def main():
             else:
                 print("Conta já existe.")
 
+        
         elif opcao == "2":
-            numero = input("Número da conta: ")
-            conta = contas.get(numero)
 
-            if conta:
-                print(f"Saldo: {conta.consultar_saldo()}")
+            numero = input("Número da conta: ")
+
+            saldo = service.consultar_saldo(numero)
+
+            if saldo is not None:
+                print(f"Saldo: R$ {saldo:.2f}")
             else:
                 print("Conta não encontrada.")
+
 
         elif opcao == "3":
             numero = input("Número da conta: ")

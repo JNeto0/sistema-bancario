@@ -1,0 +1,17 @@
+from src.conta.Conta import Conta
+
+class ContaService:
+
+    def __init__(self, repository):
+        self.repository = repository
+
+    def criar_conta(self, numero):
+        # verifica se já existe
+        if self.repository.buscar_por_numero(numero):
+            return None
+
+        conta = Conta(numero)
+        self.repository.adicionar(conta)
+        return conta
+    
+    

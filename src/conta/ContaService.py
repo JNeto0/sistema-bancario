@@ -34,5 +34,15 @@ class ContaService:
 
         return "Crédito realizado."
     
+    def debito(self, numero, valor):
+
+        conta = self.repository.buscar_por_numero(numero)
+
+        if not conta:
+            return "Conta não encontrada, verifique o código."
+
+        conta.sacar(valor)
+
+        return "Débito realizado com sucesso."
     
     

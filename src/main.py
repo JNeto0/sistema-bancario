@@ -1,7 +1,11 @@
-from conta.conta import Conta
+from src.conta.Conta import Conta
+from src.conta.ContaRepository import ContaRepository
+from src.conta.ContaService import ContaService
 
 def main():
-    contas = {}
+    contas = {} 
+    repository = ContaRepository()
+    service = ContaService(repository)
 
     while True:
         print("\n=== Sistema Bancário ===")
@@ -15,8 +19,13 @@ def main():
 
         if opcao == "1":
             numero = input("Número da conta: ")
-            contas[numero] = Conta(numero)
-            print("Conta criada com sucesso!")
+
+            conta = service.criar_conta(numero)
+
+            if conta:
+                print("Conta criada com sucesso!")
+            else:
+                print("Conta já existe.")
 
         elif opcao == "2":
             numero = input("Número da conta: ")

@@ -52,15 +52,14 @@ def main():
 
 
         elif opcao == "4":
-            numero = input("Número da conta: ")
-            valor = float(input("Valor: "))
-            conta = contas.get(numero)
 
-            if conta:
-                conta.sacar(valor)
-                print("Saque realizado.")
-            else:
-                print("Conta não encontrada.")
+            numero = input("Número da conta: ")
+
+            valor = float(input("Valor do débito: "))
+
+            mensagem = service.debito(numero, valor)
+
+            print(mensagem)
 
         elif opcao == "0":
             print("Saindo...")

@@ -17,6 +17,9 @@ class Conta:
             return True
         else:
             return False
+        
+    def consultar_saldo(self):
+        return self.saldo
 
 
         

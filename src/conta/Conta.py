@@ -12,12 +12,12 @@ class Conta:
             return False
         
     def sacar(self, valor):
-        if valor > 0 :
+        # Correção Issue #17: Adicionada verificação de saldo suficiente
+        if valor > 0 and self.saldo >= valor:
             self.saldo -= valor
             return True
         else:
-            return False
-        
+            return False       
     def consultar_saldo(self):
         return self.saldo
 

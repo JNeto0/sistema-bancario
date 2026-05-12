@@ -48,6 +48,9 @@ class ContaService:
         if not conta:
             return "Conta não encontrada, verifique o código."
 
+        if valor < 0:
+            return "Erro: Valor do crédito deve ser positivo."
+
         conta.depositar(valor)
 
         return "Crédito realizado."
@@ -56,6 +59,9 @@ class ContaService:
         conta = self.repository.buscar_por_numero(numero)
         if not conta:
             return "Conta não encontrada, verifique o código."
+
+        if valor < 0:
+            return "Erro: Valor do débito deve ser positivo."
 
         if conta.sacar(valor):
             return "Débito realizado com sucesso."
@@ -69,6 +75,9 @@ class ContaService:
         if not conta_origem or not conta_destino:
             return "Conta não encontrada, verifique o código."
 
+        if valor < 0:
+            return "Erro: Valor da transferência deve ser positivo."
+        
         if conta_origem.sacar(valor):
 
             if hasattr(conta_destino, "receber_transferencia"):

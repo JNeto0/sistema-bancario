@@ -6,13 +6,16 @@ class ContaService:
         self.repository = repository
 
     def criar_conta(self, numero):
-        # verifica se já existe
+        # Validação de 8 dígitos numéricos
+        if len(numero) != 8 or not numero.isdigit():
+            return "Erro: O número da conta deve ter exatamente 8 dígitos numéricos."
+
         if self.repository.buscar_por_numero(numero):
-            return None
+            return "Erro: Conta já existe."
 
         conta = Conta(numero)
         self.repository.adicionar(conta)
-        return conta
+        return "Conta criada com sucesso!"
     
     def consultar_saldo(self, numero):
 

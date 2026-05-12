@@ -20,13 +20,13 @@ def main():
 
         if opcao == "1":
             numero = input("Número da conta: ")
-
-            conta = service.criar_conta(numero)
-
-            if conta:
-                print("Conta criada com sucesso!")
-            else:
-                print("Conta já existe.")
+            
+            # Chamamos o service, que agora faz a validação de 8 dígitos
+            # e retorna uma string com a mensagem de sucesso ou erro.
+            mensagem = service.criar_conta(numero)
+            
+            # Exibimos a mensagem diretamente para o usuário
+            print(mensagem)
 
         
         elif opcao == "2":

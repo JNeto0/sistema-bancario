@@ -14,6 +14,8 @@ def main():
         print("3 - Depositar")
         print("4 - Sacar")
         print("5 - Transferência")
+        print("6 - Criar conta poupança")
+        print("7 - Render juros")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -73,6 +75,17 @@ def main():
             mensagem = service.transferencia(origem, destino, valor)
 
             print(mensagem)
+
+        elif opcao == "6":
+            numero = input("Número da conta poupança: ")
+            print(service.criar_poupanca(numero))
+
+        elif opcao == "7":
+            try:
+                taxa = float(input("Informe a taxa de juros (%): "))
+                print(service.render_juros_total(taxa))
+            except ValueError:
+                print("Erro: Informe um valor numérico para a taxa.")
 
         elif opcao == "0":
             print("Saindo...")

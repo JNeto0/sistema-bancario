@@ -1,4 +1,5 @@
 from src.conta.Conta import Conta
+from src.conta.ContaPoupanca import ContaPoupanca
 
 class ContaService:
 
@@ -59,3 +60,26 @@ class ContaService:
             return "Transferência realizada com sucesso."
         else:
             return "Erro: Saldo insuficiente na conta de origem."
+        
+    def criar_poupanca(self, numero):
+        if len(numero) != 8 or not numero.isdigit():
+            return "Erro: O número da conta deve ter exatamente 8 dígitos numéricos."
+        if self.repository.buscar_por_numero(numero):
+            return "Erro: Conta já existe."
+        
+        conta = ContaPoupanca(numero)
+        self.repository.adicionar(conta)
+        return "Conta Poupança criada com sucesso!"
+
+    def render_juros_total(self, taxa):
+        contas = self.repository.contas
+        encontrou_poupanca = False
+        for conta in contas:
+            if isinstance(conta, ContaPoupanca):
+                conta.render_juros(taxa)
+                encontrou_poupanca = True
+        
+        if encontrou_poupanca:
+            return f"Juros de {taxa}% aplicados com sucesso."
+        else:
+            return "Nenhuma conta poupança encontrada."

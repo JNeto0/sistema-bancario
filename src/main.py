@@ -14,19 +14,22 @@ def main():
         print("3 - Depositar")
         print("4 - Sacar")
         print("5 - Transferência")
+        print("6 - Criar conta poupança")
+        print("7 - Render juros")
+        print("8 - Criar conta bônus")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
 
         if opcao == "1":
             numero = input("Número da conta: ")
-
-            conta = service.criar_conta(numero)
-
-            if conta:
-                print("Conta criada com sucesso!")
-            else:
-                print("Conta já existe.")
+            
+            # Chamamos o service, que agora faz a validação de 8 dígitos
+            # e retorna uma string com a mensagem de sucesso ou erro.
+            mensagem = service.criar_conta(numero)
+            
+            # Exibimos a mensagem diretamente para o usuário
+            print(mensagem)
 
         
         elif opcao == "2":
@@ -73,6 +76,25 @@ def main():
             mensagem = service.transferencia(origem, destino, valor)
 
             print(mensagem)
+
+        elif opcao == "6":
+            numero = input("Número da conta poupança: ")
+            print(service.criar_poupanca(numero))
+
+        elif opcao == "7":
+            try:
+                taxa = float(input("Informe a taxa de juros (%): "))
+                print(service.render_juros_total(taxa))
+            except ValueError:
+                print("Erro: Informe um valor numérico para a taxa.")
+        
+        elif opcao == "8":
+
+            numero = input("Número da conta: ")
+
+            mensagem = service.criar_conta_bonus(numero)
+
+            print(mensagem)    
 
         elif opcao == "0":
             print("Saindo...")

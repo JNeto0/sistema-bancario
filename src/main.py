@@ -16,6 +16,7 @@ def main():
         print("5 - Transferência")
         print("6 - Criar conta poupança")
         print("7 - Render juros")
+        print("8 - Criar conta bônus")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -86,6 +87,14 @@ def main():
                 print(service.render_juros_total(taxa))
             except ValueError:
                 print("Erro: Informe um valor numérico para a taxa.")
+        
+        elif opcao == "8":
+
+            numero = input("Número da conta: ")
+
+            mensagem = service.criar_conta_bonus(numero)
+
+            print(mensagem)    
 
         elif opcao == "0":
             print("Saindo...")

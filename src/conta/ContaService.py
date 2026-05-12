@@ -1,5 +1,6 @@
 from src.conta.Conta import Conta
 from src.conta.ContaPoupanca import ContaPoupanca
+from src.conta.ContaBonus import ContaBonus
 
 class ContaService:
 
@@ -17,6 +18,19 @@ class ContaService:
         conta = Conta(numero)
         self.repository.adicionar(conta)
         return "Conta criada com sucesso!"
+    
+    def criar_conta_bonus(self, numero):
+
+        conta_existente = self.repository.buscar_por_numero(numero)
+
+        if conta_existente:
+            return "Erro: Já existe uma conta com esse número."
+
+        conta = ContaBonus(numero)
+
+        self.repository.adicionar(conta)
+
+        return "Conta bônus criada com sucesso."
     
     def consultar_saldo(self, numero):
 
@@ -56,8 +70,14 @@ class ContaService:
             return "Conta não encontrada, verifique o código."
 
         if conta_origem.sacar(valor):
-            conta_destino.depositar(valor)
+
+            if hasattr(conta_destino, "receber_transferencia"):
+                conta_destino.receber_transferencia(valor)
+            else:
+                conta_destino.depositar(valor)
+
             return "Transferência realizada com sucesso."
+
         else:
             return "Erro: Saldo insuficiente na conta de origem."
         

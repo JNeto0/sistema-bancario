@@ -6,13 +6,16 @@ class ContaService:
         self.repository = repository
 
     def criar_conta(self, numero):
-        # verifica se já existe
+        # Validação de 8 dígitos numéricos
+        if len(numero) != 8 or not numero.isdigit():
+            return "Erro: O número da conta deve ter exatamente 8 dígitos numéricos."
+
         if self.repository.buscar_por_numero(numero):
-            return None
+            return "Erro: Conta já existe."
 
         conta = Conta(numero)
         self.repository.adicionar(conta)
-        return conta
+        return "Conta criada com sucesso!"
     
     def consultar_saldo(self, numero):
 
@@ -35,28 +38,24 @@ class ContaService:
         return "Crédito realizado."
     
     def debito(self, numero, valor):
-
         conta = self.repository.buscar_por_numero(numero)
-
         if not conta:
             return "Conta não encontrada, verifique o código."
 
-        conta.sacar(valor)
+        if conta.sacar(valor):
+            return "Débito realizado com sucesso."
+        else:
+            return "Erro: Saldo insuficiente."
 
-        return "Débito realizado com sucesso."
-    
     def transferencia(self, numero_origem, numero_destino, valor):
-
         conta_origem = self.repository.buscar_por_numero(numero_origem)
-
         conta_destino = self.repository.buscar_por_numero(numero_destino)
 
         if not conta_origem or not conta_destino:
             return "Conta não encontrada, verifique o código."
 
-        conta_origem.sacar(valor)
-
-        conta_destino.depositar(valor)
-
-        return "Transferência realizada com sucesso."
-    
+        if conta_origem.sacar(valor):
+            conta_destino.depositar(valor)
+            return "Transferência realizada com sucesso."
+        else:
+            return "Erro: Saldo insuficiente na conta de origem."

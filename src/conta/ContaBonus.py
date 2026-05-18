@@ -15,5 +15,5 @@ class ContaBonus(Conta):
     def receber_transferencia(self, valor):
         self.saldo += valor
 
-        pontos = valor // 200
+        pontos = valor // 150
         self.pontuacao += int(pontos)

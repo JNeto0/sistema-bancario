@@ -7,7 +7,7 @@ class ContaService:
     def __init__(self, repository):
         self.repository = repository
 
-    def criar_conta(self, numero):
+    def criar_conta(self, numero, saldo_inicial):
         # Validação de 8 dígitos numéricos
         if len(numero) != 8 or not numero.isdigit():
             return "Erro: O número da conta deve ter exatamente 8 dígitos numéricos."
@@ -15,7 +15,7 @@ class ContaService:
         if self.repository.buscar_por_numero(numero):
             return "Erro: Conta já existe."
 
-        conta = Conta(numero)
+        conta = Conta(numero, saldo_inicial)
         self.repository.adicionar(conta)
         return "Conta criada com sucesso!"
     

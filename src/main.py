@@ -23,10 +23,10 @@ def main():
 
         if opcao == "1":
             numero = input("Número da conta: ")
-            
+            saldo_inicial = float(input("Saldo inicial: "))
             # Chamamos o service, que agora faz a validação de 8 dígitos
             # e retorna uma string com a mensagem de sucesso ou erro.
-            mensagem = service.criar_conta(numero)
+            mensagem = service.criar_conta(numero, saldo_inicial)
             
             # Exibimos a mensagem diretamente para o usuário
             print(mensagem)

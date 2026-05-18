@@ -17,3 +17,4 @@ class ContaBonus(Conta):
 
         pontos = valor // 200
         self.pontuacao += int(pontos)
+

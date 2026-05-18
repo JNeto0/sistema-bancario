@@ -10,3 +10,7 @@ class ContaPoupanca(Conta):
             self.depositar(juros)
             return True
         return False
+    
+    def limite_negativo(self):
+        return 0
+    

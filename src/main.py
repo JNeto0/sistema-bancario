@@ -79,7 +79,8 @@ def main():
 
         elif opcao == "6":
             numero = input("Número da conta poupança: ")
-            print(service.criar_poupanca(numero))
+            saldo_inicial = float(input("Saldo inicial: "))
+            print(service.criar_poupanca(numero, saldo_inicial))
 
         elif opcao == "7":
             try:

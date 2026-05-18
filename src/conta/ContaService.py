@@ -90,14 +90,15 @@ class ContaService:
         else:
             return "Erro: Saldo insuficiente na conta de origem."
         
-    def criar_poupanca(self, numero):
+    def criar_poupanca(self, numero, saldo_inicial):
         if len(numero) != 8 or not numero.isdigit():
             return "Erro: O número da conta deve ter exatamente 8 dígitos numéricos."
         if self.repository.buscar_por_numero(numero):
             return "Erro: Conta já existe."
         
-        conta = ContaPoupanca(numero)
+        conta = ContaPoupanca(numero, saldo_inicial)
         self.repository.adicionar(conta)
+        
         return "Conta Poupança criada com sucesso!"
 
     def render_juros_total(self, taxa):

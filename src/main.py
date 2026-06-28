@@ -17,6 +17,7 @@ def main():
         print("6 - Criar conta poupança")
         print("7 - Render juros")
         print("8 - Criar conta bônus")
+        print("9 - Consultar dados da conta")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -95,6 +96,21 @@ def main():
             mensagem = service.criar_conta_bonus(numero)
 
             print(mensagem)    
+
+        elif opcao == "9":
+
+            numero = input("Número da conta: ")
+
+            dados = service.consultar_conta(numero)
+
+            if dados is not None:
+                print(f"Tipo: {dados['tipo']}")
+                print(f"Número: {dados['numero']}")
+                print(f"Saldo: R$ {dados['saldo']:.2f}")
+                if "bonus" in dados:
+                    print(f"Bônus: {dados['bonus']}")
+            else:
+                print("Conta não encontrada.")
 
         elif opcao == "0":
             print("Saindo...")

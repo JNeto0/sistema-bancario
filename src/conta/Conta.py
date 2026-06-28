@@ -21,6 +21,9 @@ class Conta:
     def consultar_saldo(self):
         return self.saldo
 
-
-        
-
+    def consultar_dados(self):
+        return {
+            "tipo": "Conta Simples",
+            "numero": self.numero,
+            "saldo": self.saldo,
+        }

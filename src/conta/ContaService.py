@@ -40,6 +40,14 @@ class ContaService:
             return None
 
         return conta.consultar_saldo()
+
+    def consultar_conta(self, numero):
+        conta = self.repository.buscar_por_numero(numero)
+
+        if not conta:
+            return None
+
+        return conta.consultar_dados()
     
     def credito(self, numero, valor):
 

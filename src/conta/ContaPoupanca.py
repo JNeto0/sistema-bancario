@@ -10,3 +10,8 @@ class ContaPoupanca(Conta):
             self.depositar(juros)
             return True
         return False
+
+    def consultar_dados(self):
+        dados = super().consultar_dados()
+        dados["tipo"] = "Conta Poupança"
+        return dados

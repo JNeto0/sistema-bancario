@@ -1,124 +1,106 @@
-from src.conta.Conta import Conta
 from src.conta.ContaRepository import ContaRepository
 from src.conta.ContaService import ContaService
 
+
 def main():
-    contas = {} 
     repository = ContaRepository()
     service = ContaService(repository)
 
     while True:
-        print("\n=== Sistema Bancário ===")
+        print("\n=== Sistema Bancario ===")
         print("1 - Criar conta")
         print("2 - Consultar saldo")
         print("3 - Depositar")
         print("4 - Sacar")
-        print("5 - Transferência")
-        print("6 - Criar conta poupança")
+        print("5 - Transferencia")
+        print("6 - Criar conta poupanca")
         print("7 - Render juros")
-        print("8 - Criar conta bônus")
+        print("8 - Criar conta bonus")
         print("9 - Consultar dados da conta")
         print("0 - Sair")
 
-        opcao = input("Escolha uma opção: ")
+        opcao = input("Escolha uma opcao: ")
 
         if opcao == "1":
-            numero = input("Número da conta: ")
+            numero = input("Numero da conta: ")
             saldo_inicial = float(input("Saldo inicial: "))
-            # Chamamos o service, que agora faz a validação de 8 dígitos
-            # e retorna uma string com a mensagem de sucesso ou erro.
-            mensagem = service.criar_conta(numero, saldo_inicial)
-            
-            # Exibimos a mensagem diretamente para o usuário
-            print(mensagem)
+            resultado = service.criar_conta(numero, saldo_inicial)
 
-        
+            print(resultado.mensagem)
+
         elif opcao == "2":
+            numero = input("Numero da conta: ")
+            resultado = service.consultar_saldo(numero)
 
-            numero = input("Número da conta: ")
-
-            saldo = service.consultar_saldo(numero)
-
-            if saldo is not None:
+            if resultado.sucesso:
+                saldo = resultado.dados["saldo"]
                 print(f"Saldo: R$ {saldo:.2f}")
             else:
-                print("Conta não encontrada.")
-
+                print(resultado.mensagem)
 
         elif opcao == "3":
+            numero = input("Numero da conta: ")
+            valor = float(input("Valor do credito: "))
+            resultado = service.credito(numero, valor)
 
-            numero = input("Número da conta: ")
-
-            valor = float(input("Valor do crédito: "))
-
-            mensagem = service.credito(numero, valor)
-
-            print(mensagem)
-
+            print(resultado.mensagem)
 
         elif opcao == "4":
+            numero = input("Numero da conta: ")
+            valor = float(input("Valor do debito: "))
+            resultado = service.debito(numero, valor)
 
-            numero = input("Número da conta: ")
-
-            valor = float(input("Valor do débito: "))
-
-            mensagem = service.debito(numero, valor)
-
-            print(mensagem)
+            print(resultado.mensagem)
 
         elif opcao == "5":
-
             origem = input("Conta origem: ")
-
             destino = input("Conta destino: ")
+            valor = float(input("Valor da transferencia: "))
+            resultado = service.transferencia(origem, destino, valor)
 
-            valor = float(input("Valor da transferência: "))
-
-            mensagem = service.transferencia(origem, destino, valor)
-
-            print(mensagem)
+            print(resultado.mensagem)
 
         elif opcao == "6":
-            numero = input("Número da conta poupança: ")
+            numero = input("Numero da conta poupanca: ")
             saldo_inicial = float(input("Saldo inicial: "))
-            print(service.criar_poupanca(numero, saldo_inicial))
+            resultado = service.criar_poupanca(numero, saldo_inicial)
+
+            print(resultado.mensagem)
 
         elif opcao == "7":
             try:
                 taxa = float(input("Informe a taxa de juros (%): "))
-                print(service.render_juros_total(taxa))
+                resultado = service.render_juros_total(taxa)
+                print(resultado.mensagem)
             except ValueError:
-                print("Erro: Informe um valor numérico para a taxa.")
-        
+                print("Erro: Informe um valor numerico para a taxa.")
+
         elif opcao == "8":
+            numero = input("Numero da conta: ")
+            resultado = service.criar_conta_bonus(numero)
 
-            numero = input("Número da conta: ")
-
-            mensagem = service.criar_conta_bonus(numero)
-
-            print(mensagem)    
+            print(resultado.mensagem)
 
         elif opcao == "9":
+            numero = input("Numero da conta: ")
+            resultado = service.consultar_conta(numero)
 
-            numero = input("Número da conta: ")
-
-            dados = service.consultar_conta(numero)
-
-            if dados is not None:
+            if resultado.sucesso:
+                dados = resultado.dados
                 print(f"Tipo: {dados['tipo']}")
-                print(f"Número: {dados['numero']}")
+                print(f"Numero: {dados['numero']}")
                 print(f"Saldo: R$ {dados['saldo']:.2f}")
                 if "bonus" in dados:
-                    print(f"Bônus: {dados['bonus']}")
+                    print(f"Bonus: {dados['bonus']}")
             else:
-                print("Conta não encontrada.")
+                print(resultado.mensagem)
 
         elif opcao == "0":
             print("Saindo...")
             break
 
         else:
-            print("Opção inválida.")
+            print("Opcao invalida.")
 
 
 if __name__ == "__main__":

@@ -13,14 +13,21 @@ class Conta:
         
     def sacar(self, valor):
         # Correção Issue #17: Adicionada verificação de saldo suficiente
-        if valor > 0 and self.saldo >= valor:
+        if self.saldo - valor >= self.limite_negativo():
             self.saldo -= valor
             return True
         else:
-            return False       
+            return False
+               
     def consultar_saldo(self):
         return self.saldo
+    
+    def limite_negativo(self):
+        return -1000
 
-
-        
-
+    def consultar_dados(self):
+        return {
+            "tipo": "Conta Simples",
+            "numero": self.numero,
+            "saldo": self.saldo,
+        }

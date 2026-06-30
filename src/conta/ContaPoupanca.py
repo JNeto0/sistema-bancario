@@ -1,7 +1,7 @@
 from src.conta.Conta import Conta
 
 class ContaPoupanca(Conta):
-    def __init__(self, numero, saldo=0.0):
+    def __init__(self, numero, saldo):
         super().__init__(numero, saldo)
 
     def render_juros(self, taxa):
@@ -10,3 +10,11 @@ class ContaPoupanca(Conta):
             self.depositar(juros)
             return True
         return False
+    
+    def limite_negativo(self):
+        return 0
+
+    def consultar_dados(self):
+        dados = super().consultar_dados()
+        dados["tipo"] = "Conta Poupanca"
+        return dados

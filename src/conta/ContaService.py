@@ -1,114 +1,185 @@
 from src.conta.Conta import Conta
 from src.conta.ContaPoupanca import ContaPoupanca
 from src.conta.ContaBonus import ContaBonus
+from src.conta.ResultadoService import ResultadoService
+
 
 class ContaService:
 
     def __init__(self, repository):
         self.repository = repository
 
+    def _sucesso(self, mensagem, dados=None):
+        return ResultadoService(True, mensagem, dados=dados)
+
+    def _erro(self, mensagem, codigo):
+        return ResultadoService(False, mensagem, erro=codigo)
+
+    def _numero_invalido(self, numero):
+        return len(numero) != 8 or not numero.isdigit()
+
+    def _dados_conta(self, conta):
+        dados = {
+            "tipo": "Conta Simples",
+            "numero": conta.numero,
+            "saldo": conta.consultar_saldo(),
+        }
+
+        if isinstance(conta, ContaPoupanca):
+            dados["tipo"] = "Conta Poupanca"
+
+        if isinstance(conta, ContaBonus):
+            dados["tipo"] = "Conta Bonus"
+            dados["bonus"] = conta.pontuacao
+
+        return dados
+
     def criar_conta(self, numero, saldo_inicial):
-        # Validação de 8 dígitos numéricos
-        if len(numero) != 8 or not numero.isdigit():
-            return "Erro: O número da conta deve ter exatamente 8 dígitos numéricos."
+        if self._numero_invalido(numero):
+            return self._erro(
+                "Erro: O numero da conta deve ter exatamente 8 digitos numericos.",
+                "NUMERO_CONTA_INVALIDO",
+            )
 
         if self.repository.buscar_por_numero(numero):
-            return "Erro: Conta já existe."
+            return self._erro("Erro: Conta ja existe.", "CONTA_JA_EXISTE")
 
         conta = Conta(numero, saldo_inicial)
         self.repository.adicionar(conta)
-        return "Conta criada com sucesso!"
-    
+        return self._sucesso("Conta criada com sucesso!", self._dados_conta(conta))
+
     def criar_conta_bonus(self, numero):
+        if self._numero_invalido(numero):
+            return self._erro(
+                "Erro: O numero da conta deve ter exatamente 8 digitos numericos.",
+                "NUMERO_CONTA_INVALIDO",
+            )
 
         conta_existente = self.repository.buscar_por_numero(numero)
 
         if conta_existente:
-            return "Erro: Já existe uma conta com esse número."
+            return self._erro("Erro: Ja existe uma conta com esse numero.", "CONTA_JA_EXISTE")
 
         conta = ContaBonus(numero)
-
         self.repository.adicionar(conta)
 
-        return "Conta bônus criada com sucesso."
-    
+        return self._sucesso("Conta bonus criada com sucesso.", self._dados_conta(conta))
+
     def consultar_saldo(self, numero):
-
         conta = self.repository.buscar_por_numero(numero)
 
         if not conta:
-            return None
+            return self._erro("Conta nao encontrada.", "CONTA_NAO_ENCONTRADA")
 
-        return conta.consultar_saldo()
-    
+        return self._sucesso(
+            "Saldo consultado com sucesso.",
+            {"numero": conta.numero, "saldo": conta.consultar_saldo()},
+        )
+
+    def consultar_conta(self, numero):
+        conta = self.repository.buscar_por_numero(numero)
+
+        if not conta:
+            return self._erro("Conta nao encontrada.", "CONTA_NAO_ENCONTRADA")
+
+        return self._sucesso("Conta consultada com sucesso.", self._dados_conta(conta))
+
     def credito(self, numero, valor):
-
         conta = self.repository.buscar_por_numero(numero)
 
         if not conta:
-            return "Conta não encontrada, verifique o código."
+            return self._erro(
+                "Conta nao encontrada, verifique o codigo.",
+                "CONTA_NAO_ENCONTRADA",
+            )
 
         if valor < 0:
-            return "Erro: Valor do crédito deve ser positivo."
+            return self._erro("Erro: Valor do credito deve ser positivo.", "VALOR_INVALIDO")
 
         conta.depositar(valor)
 
-        return "Crédito realizado."
-    
+        return self._sucesso("Credito realizado.", self._dados_conta(conta))
+
     def debito(self, numero, valor):
         conta = self.repository.buscar_por_numero(numero)
+
         if not conta:
-            return "Conta não encontrada, verifique o código."
+            return self._erro(
+                "Conta nao encontrada, verifique o codigo.",
+                "CONTA_NAO_ENCONTRADA",
+            )
 
         if valor < 0:
-            return "Erro: Valor do débito deve ser positivo."
+            return self._erro("Erro: Valor do debito deve ser positivo.", "VALOR_INVALIDO")
 
         if conta.sacar(valor):
-            return "Débito realizado com sucesso."
-        else:
-            return "Erro: Saldo insuficiente."
+            return self._sucesso("Debito realizado com sucesso.", self._dados_conta(conta))
+
+        return self._erro("Erro: Saldo insuficiente.", "SALDO_INSUFICIENTE")
 
     def transferencia(self, numero_origem, numero_destino, valor):
         conta_origem = self.repository.buscar_por_numero(numero_origem)
         conta_destino = self.repository.buscar_por_numero(numero_destino)
 
         if not conta_origem or not conta_destino:
-            return "Conta não encontrada, verifique o código."
+            return self._erro(
+                "Conta nao encontrada, verifique o codigo.",
+                "CONTA_NAO_ENCONTRADA",
+            )
 
         if valor < 0:
-            return "Erro: Valor da transferência deve ser positivo."
-        
-        if conta_origem.sacar(valor):
+            return self._erro("Erro: Valor da transferencia deve ser positivo.", "VALOR_INVALIDO")
 
+        if conta_origem.sacar(valor):
             if hasattr(conta_destino, "receber_transferencia"):
                 conta_destino.receber_transferencia(valor)
             else:
                 conta_destino.depositar(valor)
 
-            return "Transferência realizada com sucesso."
+            return self._sucesso(
+                "Transferencia realizada com sucesso.",
+                {
+                    "origem": self._dados_conta(conta_origem),
+                    "destino": self._dados_conta(conta_destino),
+                },
+            )
 
-        else:
-            return "Erro: Saldo insuficiente na conta de origem."
-        
-    def criar_poupanca(self, numero):
-        if len(numero) != 8 or not numero.isdigit():
-            return "Erro: O número da conta deve ter exatamente 8 dígitos numéricos."
+        return self._erro(
+            "Erro: Saldo insuficiente na conta de origem.",
+            "SALDO_INSUFICIENTE",
+        )
+
+    def criar_poupanca(self, numero, saldo_inicial):
+        if self._numero_invalido(numero):
+            return self._erro(
+                "Erro: O numero da conta deve ter exatamente 8 digitos numericos.",
+                "NUMERO_CONTA_INVALIDO",
+            )
+
         if self.repository.buscar_por_numero(numero):
-            return "Erro: Conta já existe."
-        
-        conta = ContaPoupanca(numero)
+            return self._erro("Erro: Conta ja existe.", "CONTA_JA_EXISTE")
+
+        conta = ContaPoupanca(numero, saldo_inicial)
         self.repository.adicionar(conta)
-        return "Conta Poupança criada com sucesso!"
+
+        return self._sucesso("Conta Poupanca criada com sucesso!", self._dados_conta(conta))
 
     def render_juros_total(self, taxa):
-        contas = self.repository.contas
-        encontrou_poupanca = False
+        contas = self.repository.listar_todas()
+        poupancas = []
+
         for conta in contas:
             if isinstance(conta, ContaPoupanca):
                 conta.render_juros(taxa)
-                encontrou_poupanca = True
-        
-        if encontrou_poupanca:
-            return f"Juros de {taxa}% aplicados com sucesso."
-        else:
-            return "Nenhuma conta poupança encontrada."
+                poupancas.append(self._dados_conta(conta))
+
+        if poupancas:
+            return self._sucesso(
+                f"Juros de {taxa}% aplicados com sucesso.",
+                {"contas": poupancas},
+            )
+
+        return self._erro(
+            "Nenhuma conta poupanca encontrada.",
+            "NENHUMA_POUPANCA_ENCONTRADA",
+        )

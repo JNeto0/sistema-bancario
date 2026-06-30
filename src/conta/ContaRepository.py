@@ -11,3 +11,6 @@ class ContaRepository:
             if conta.numero == numero:
                 return conta
         return None
+
+    def listar_todas(self):
+        return list(self.contas)

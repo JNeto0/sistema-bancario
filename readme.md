@@ -53,8 +53,48 @@ git clone https://github.com/JNeto0/sistema-bancario.git
     cd sistema-bancario
   ```
 
-- Execute o seguinte comando para inicar o sistema.
+- Execute o seguinte comando para iniciar a interface de console.
 
   ```bash
-    python3 -m src.main
+    python -m src.main
   ```
+
+---
+
+## API REST
+
+A base da API REST usa apenas a biblioteca padrao do Python.
+
+### Executar a API
+
+```bash
+python -m src.api
+```
+
+Por padrao, o servidor sobe em `http://127.0.0.1:8000`.
+
+### Endpoints disponiveis
+
+- `POST /banco/conta/`
+- `GET /banco/conta/<id>`
+- `GET /banco/conta/<id>/saldo`
+- `PUT /banco/conta/<id>/credito`
+- `PUT /banco/conta/<id>/debito`
+- `PUT /banco/conta/transferencia`
+- `PUT /banco/conta/rendimento`
+
+### Exemplo de cadastro
+
+```bash
+curl -X POST http://127.0.0.1:8000/banco/conta/ ^
+  -H "Content-Type: application/json" ^
+  -d "{\"numero\":\"12345678\",\"tipo\":\"simples\",\"saldo_inicial\":100}"
+```
+
+### Exemplo de credito
+
+```bash
+curl -X PUT http://127.0.0.1:8000/banco/conta/12345678/credito ^
+  -H "Content-Type: application/json" ^
+  -d "{\"valor\":50}"
+```

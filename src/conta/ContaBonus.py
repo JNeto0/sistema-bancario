@@ -20,6 +20,6 @@ class ContaBonus(Conta):
 
     def consultar_dados(self):
         dados = super().consultar_dados()
-        dados["tipo"] = "Conta Bônus"
+        dados["tipo"] = "Conta Bonus"
         dados["bonus"] = self.pontuacao
         return dados

@@ -16,5 +16,5 @@ class ContaPoupanca(Conta):
 
     def consultar_dados(self):
         dados = super().consultar_dados()
-        dados["tipo"] = "Conta Poupança"
+        dados["tipo"] = "Conta Poupanca"
         return dados

@@ -17,3 +17,9 @@ class ContaBonus(Conta):
 
         pontos = valor // 150
         self.pontuacao += int(pontos)
+
+    def consultar_dados(self):
+        dados = super().consultar_dados()
+        dados["tipo"] = "Conta Bônus"
+        dados["bonus"] = self.pontuacao
+        return dados

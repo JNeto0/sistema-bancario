@@ -25,6 +25,9 @@ class Conta:
     def limite_negativo(self):
         return -1000
 
-
-        
-
+    def consultar_dados(self):
+        return {
+            "tipo": "Conta Simples",
+            "numero": self.numero,
+            "saldo": self.saldo,
+        }

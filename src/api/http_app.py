@@ -149,18 +149,17 @@ class BancoHTTPRequestHandler(BaseHTTPRequestHandler):
         return self._metodo_nao_permitido()
 
 
-def criar_servidor(host="127.0.0.1", port=8000):
+def criar_servidor(host="0.0.0.0", port=8080):
     repository = ContaRepository()
     service = ContaService(repository)
     BancoHTTPRequestHandler.controller = ContaController(service)
     return ThreadingHTTPServer((host, port), BancoHTTPRequestHandler)
 
 
-def run(host="127.0.0.1", port=8000):
-    host = os.getenv("API_HOST", host)
-    port = int(os.getenv("API_PORT", port))
+def run(host="0.0.0.0", port=8080):
     servidor = criar_servidor(host, port)
-    print(f"API REST disponivel em http://{host}:{port}")
+    endereco_exibicao = "127.0.0.1" if host == "0.0.0.0" else host
+    print(f"API REST disponivel em http://{endereco_exibicao}:{port}")
     try:
         servidor.serve_forever()
     except KeyboardInterrupt:

@@ -1,9 +1,9 @@
-name: Production Release
+name: Staging Release
 
 on:
   pull_request:
     branches:
-      - production
+      - staging
     types:
       - closed
 
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && (github.event.pull_request.head.ref == 'staging' || startsWith(github.event.pull_request.head.ref, 'hotfix'))
+    if: github.event.pull_request.merged == true && (github.event.pull_request.head.ref == 'main' || startsWith(github.event.pull_request.head.ref, 'bugfix'))
     runs-on: ubuntu-latest
 
     steps:
@@ -61,11 +61,11 @@ jobs:
           head_ref = os.environ["HEAD_REF"]
 
           subprocess.check_call(["git", "fetch", "--tags", "--force"])
-          raw_tags = subprocess.check_output(["git", "tag", "--list", "rel-*"], text=True).splitlines()
+          raw_tags = subprocess.check_output(["git", "tag", "--list", "rc-*"], text=True).splitlines()
           versions = []
 
           for tag in raw_tags:
-            match = re.fullmatch(r"rel-(\d+)\.(\d+)(?:\.(\d+))?", tag.strip())
+            match = re.fullmatch(r"rc-(\d+)\.(\d+)(?:\.(\d+))?", tag.strip())
             if not match:
               continue
 
@@ -79,10 +79,10 @@ jobs:
           else:
             major, minor, patch = 0, 0, 0
 
-          if head_ref == "staging":
-            release_tag = f"rel-{major}.{minor + 1}.0"
+          if head_ref == "main":
+            release_tag = f"rc-{major}.{minor + 1}.0"
           else:
-            release_tag = f"rel-{major}.{minor}.{patch + 1}"
+            release_tag = f"rc-{major}.{minor}.{patch + 1}"
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
             output.write(f"tag={release_tag}\n")
@@ -124,10 +124,13 @@ jobs:
                   continue
 
                 full_path = os.path.join(root, file_name)
-                if os.path.normpath(full_path) == os.path.normpath(output_path):
+                normalized_path = os.path.normpath(full_path)
+
+                if normalized_path in excluded_files:
                   continue
 
-                archive.write(full_path, os.path.relpath(full_path, "."))
+                archive_name = os.path.relpath(full_path, ".")
+                archive.write(full_path, archive_name)
           PY
 
       - name: Log in to Docker Hub
@@ -153,20 +156,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag "$RELEASE_TAG"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git "$RELEASE_TAG"
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sistema-bancario:${{ steps.tag.outputs.tag }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

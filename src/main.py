@@ -19,7 +19,7 @@ def main():
         print("9 - Consultar dados da conta")
         print("0 - Sair")
 
-        opcao = input("Escolha uma opcao: ")
+        opcao = input("Escolha uma opcao: ").strip()
 
         if opcao == "1":
             numero = input("Numero da conta: ")
@@ -100,7 +100,7 @@ def main():
             break
 
         else:
-            print("Opcao invalida.")
+            print("Opcao invalida. Tente novamente.")
 
 
 if __name__ == "__main__":

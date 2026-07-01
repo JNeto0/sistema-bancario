@@ -141,3 +141,16 @@ No container, a API fica disponivel em `http://127.0.0.1:8080`.
 Imagem publicada em:
 
 https://hub.docker.com/r/<dockerhub-usuario>/sistema-bancario
+
+---
+
+## Git Hooks
+
+Para ativar a validação local de mensagens de commit, configure o caminho de hooks:
+
+```bash
+git config core.hooksPath hooks
+```
+
+O hook `commit-msg` vai rejeitar commits fora do formato `#NUM_ISSUE - MENSAGEM`
+e também validar se a issue existe no repositório GitHub.

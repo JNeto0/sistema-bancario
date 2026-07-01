@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+set -eu
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+python "$script_dir/validate_commit_message.py" --message-file "$1"

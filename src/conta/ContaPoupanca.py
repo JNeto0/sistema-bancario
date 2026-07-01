@@ -13,4 +13,8 @@ class ContaPoupanca(Conta):
     
     def limite_negativo(self):
         return 0
-    
+
+    def consultar_dados(self):
+        dados = super().consultar_dados()
+        dados["tipo"] = "Conta Poupanca"
+        return dados

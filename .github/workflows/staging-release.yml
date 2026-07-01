@@ -1,0 +1,150 @@
+name: Staging Release
+
+on:
+  pull_request:
+    branches:
+      - staging
+    types:
+      - closed
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true && (github.event.pull_request.head.ref == 'main' || startsWith(github.event.pull_request.head.ref, 'bugfix'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt
+          else
+            echo "No requirements.txt found, skipping dependency installation."
+          fi
+          python -m pip install ruff
+
+      - name: Build check
+        run: python -m compileall src tests
+
+      - name: Quality
+        run: ruff check src tests
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Determine release tag
+        id: tag
+        shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import subprocess
+
+          head_ref = os.environ["HEAD_REF"]
+
+          raw_tags = subprocess.check_output(["git", "tag", "--list", "rc-*"], text=True).splitlines()
+          versions = []
+
+          for tag in raw_tags:
+            match = re.fullmatch(r"rc-(\d+)\.(\d+)(?:\.(\d+))?", tag.strip())
+            if not match:
+              continue
+
+            major = int(match.group(1))
+            minor = int(match.group(2))
+            patch = int(match.group(3) or 0)
+            versions.append((major, minor, patch))
+
+          if versions:
+            major, minor, patch = max(versions)
+          else:
+            major, minor, patch = 0, 0, 0
+
+          if head_ref == "main":
+            release_tag = f"rc-{major}.{minor + 1}"
+          else:
+            release_tag = f"rc-{major}.{minor}.{patch + 1}"
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+            output.write(f"tag={release_tag}\n")
+          PY
+
+      - name: Create release package
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          mkdir -p dist
+          python - <<'PY'
+          import os
+          import zipfile
+
+          release_tag = os.environ["RELEASE_TAG"]
+          output_path = os.path.join("dist", f"{release_tag}.zip")
+
+          excluded_dirs = {
+              ".git",
+              ".github",
+              "__pycache__",
+              ".pytest_cache",
+              ".mypy_cache",
+              ".venv",
+              "venv",
+              "env",
+              "dist",
+          }
+
+          excluded_files = {output_path}
+
+          with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            for root, dirs, files in os.walk("."):
+              dirs[:] = [directory for directory in dirs if directory not in excluded_dirs]
+
+              for file_name in files:
+                if file_name.endswith((".pyc", ".pyo", ".pyd")):
+                  continue
+
+                full_path = os.path.join(root, file_name)
+                normalized_path = os.path.normpath(full_path)
+
+                if normalized_path in excluded_files:
+                  continue
+
+                archive_name = os.path.relpath(full_path, ".")
+                archive.write(full_path, archive_name)
+          PY
+
+      - name: Create and publish tag
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$RELEASE_TAG"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git "$RELEASE_TAG"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.tag.outputs.tag }}.zip
+          path: dist/${{ steps.tag.outputs.tag }}.zip

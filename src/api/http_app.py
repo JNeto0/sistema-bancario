@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -156,6 +157,8 @@ def criar_servidor(host="127.0.0.1", port=8000):
 
 
 def run(host="127.0.0.1", port=8000):
+    host = os.getenv("API_HOST", host)
+    port = int(os.getenv("API_PORT", port))
     servidor = criar_servidor(host, port)
     print(f"API REST disponivel em http://{host}:{port}")
     try:

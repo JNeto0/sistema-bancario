@@ -1,9 +1,9 @@
-name: Staging Release
+name: Production Release
 
 on:
   pull_request:
     branches:
-      - staging
+      - production
     types:
       - closed
 
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && (github.event.pull_request.head.ref == 'main' || startsWith(github.event.pull_request.head.ref, 'bugfix'))
+    if: github.event.pull_request.merged == true && (github.event.pull_request.head.ref == 'staging' || startsWith(github.event.pull_request.head.ref, 'hotfix'))
     runs-on: ubuntu-latest
 
     steps:
@@ -60,11 +60,11 @@ jobs:
 
           head_ref = os.environ["HEAD_REF"]
 
-          raw_tags = subprocess.check_output(["git", "tag", "--list", "rc-*"], text=True).splitlines()
+          raw_tags = subprocess.check_output(["git", "tag", "--list", "rel-*"], text=True).splitlines()
           versions = []
 
           for tag in raw_tags:
-            match = re.fullmatch(r"rc-(\d+)\.(\d+)(?:\.(\d+))?", tag.strip())
+            match = re.fullmatch(r"rel-(\d+)\.(\d+)(?:\.(\d+))?", tag.strip())
             if not match:
               continue
 
@@ -78,10 +78,10 @@ jobs:
           else:
             major, minor, patch = 0, 0, 0
 
-          if head_ref == "main":
-            release_tag = f"rc-{major}.{minor + 1}.0"
+          if head_ref == "staging":
+            release_tag = f"rel-{major}.{minor + 1}.0"
           else:
-            release_tag = f"rc-{major}.{minor}.{patch + 1}"
+            release_tag = f"rel-{major}.{minor}.{patch + 1}"
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
             output.write(f"tag={release_tag}\n")
@@ -112,8 +112,6 @@ jobs:
               "dist",
           }
 
-          excluded_files = {output_path}
-
           with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
             for root, dirs, files in os.walk("."):
               dirs[:] = [directory for directory in dirs if directory not in excluded_dirs]
@@ -123,13 +121,10 @@ jobs:
                   continue
 
                 full_path = os.path.join(root, file_name)
-                normalized_path = os.path.normpath(full_path)
-
-                if normalized_path in excluded_files:
+                if os.path.normpath(full_path) == os.path.normpath(output_path):
                   continue
 
-                archive_name = os.path.relpath(full_path, ".")
-                archive.write(full_path, archive_name)
+                archive.write(full_path, os.path.relpath(full_path, "."))
           PY
 
       - name: Log in to Docker Hub

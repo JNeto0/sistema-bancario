@@ -112,6 +112,8 @@ jobs:
               "dist",
           }
 
+          excluded_files = {output_path}
+
           with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
             for root, dirs, files in os.walk("."):
               dirs[:] = [directory for directory in dirs if directory not in excluded_dirs]
@@ -121,10 +123,13 @@ jobs:
                   continue
 
                 full_path = os.path.join(root, file_name)
-                if os.path.normpath(full_path) == os.path.normpath(output_path):
+                normalized_path = os.path.normpath(full_path)
+
+                if normalized_path in excluded_files:
                   continue
 
-                archive.write(full_path, os.path.relpath(full_path, "."))
+                archive_name = os.path.relpath(full_path, ".")
+                archive.write(full_path, archive_name)
           PY
 
       - name: Log in to Docker Hub

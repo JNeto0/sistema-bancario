@@ -60,6 +60,7 @@ jobs:
 
           head_ref = os.environ["HEAD_REF"]
 
+          subprocess.check_call(["git", "fetch", "--tags", "--force"])
           raw_tags = subprocess.check_output(["git", "tag", "--list", "rc-*"], text=True).splitlines()
           versions = []
 

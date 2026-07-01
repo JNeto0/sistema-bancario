@@ -111,3 +111,59 @@ curl -X PUT http://127.0.0.1:8080/banco/conta/12345678/credito ^
   -H "Content-Type: application/json" ^
   -d "{\"valor\":50}"
 ```
+
+---
+
+## Execucao da versao de producao
+
+### Aplicacao local
+
+```bash
+python -m src.main
+```
+
+### API REST local
+
+```bash
+python -m src.api
+```
+
+Por padrao, a API sobe em `http://127.0.0.1:8000`.
+
+### API REST via Docker
+
+```bash
+docker build -t sistema-bancario .
+docker run --rm -p 8080:8080 sistema-bancario
+```
+
+No container, a API fica disponivel em `http://127.0.0.1:8080`.
+
+### Endpoints da API
+
+- `POST /banco/conta/`
+- `GET /banco/conta/<id>`
+- `GET /banco/conta/<id>/saldo`
+- `PUT /banco/conta/<id>/credito`
+- `PUT /banco/conta/<id>/debito`
+- `PUT /banco/conta/transferencia`
+- `PUT /banco/conta/rendimento`
+
+### Imagem no Docker Hub
+
+Imagem publicada em:
+
+https://hub.docker.com/r/<dockerhub-usuario>/sistema-bancario
+
+---
+
+## Git Hooks
+
+Para ativar a validação local de mensagens de commit, configure o caminho de hooks:
+
+```bash
+git config core.hooksPath hooks
+```
+
+O hook `commit-msg` vai rejeitar commits fora do formato `#NUM_ISSUE - MENSAGEM`
+e também validar se a issue existe no repositório GitHub.

@@ -60,6 +60,7 @@ jobs:
 
           head_ref = os.environ["HEAD_REF"]
 
+          subprocess.check_call(["git", "fetch", "--tags", "--force"])
           raw_tags = subprocess.check_output(["git", "tag", "--list", "rel-*"], text=True).splitlines()
           versions = []
 
@@ -112,6 +113,8 @@ jobs:
               "dist",
           }
 
+          excluded_files = {output_path}
+
           with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
             for root, dirs, files in os.walk("."):
               dirs[:] = [directory for directory in dirs if directory not in excluded_dirs]
@@ -150,6 +153,20 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag "$RELEASE_TAG"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git "$RELEASE_TAG"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sistema-bancario:${{ steps.tag.outputs.tag }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

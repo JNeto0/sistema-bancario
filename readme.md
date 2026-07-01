@@ -71,7 +71,20 @@ A base da API REST usa apenas a biblioteca padrao do Python.
 python -m src.api
 ```
 
-Por padrao, o servidor sobe em `http://127.0.0.1:8000`.
+Por padrao, o servidor sobe em `http://127.0.0.1:8080`.
+
+### Executar via Docker
+
+```bash
+docker build -t sistema-bancario-api .
+docker run --rm -p 8080:8080 sistema-bancario-api
+```
+
+### Imagem no Docker Hub
+
+Imagem publicada para consumo pela pipeline:
+
+`https://hub.docker.com/r/jneto0/sistema-bancario-api`
 
 ### Endpoints disponiveis
 
@@ -86,7 +99,7 @@ Por padrao, o servidor sobe em `http://127.0.0.1:8000`.
 ### Exemplo de cadastro
 
 ```bash
-curl -X POST http://127.0.0.1:8000/banco/conta/ ^
+curl -X POST http://127.0.0.1:8080/banco/conta/ ^
   -H "Content-Type: application/json" ^
   -d "{\"numero\":\"12345678\",\"tipo\":\"simples\",\"saldo_inicial\":100}"
 ```
@@ -94,7 +107,7 @@ curl -X POST http://127.0.0.1:8000/banco/conta/ ^
 ### Exemplo de credito
 
 ```bash
-curl -X PUT http://127.0.0.1:8000/banco/conta/12345678/credito ^
+curl -X PUT http://127.0.0.1:8080/banco/conta/12345678/credito ^
   -H "Content-Type: application/json" ^
   -d "{\"valor\":50}"
 ```

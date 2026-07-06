@@ -145,8 +145,8 @@ class ContaService:
             )
 
         return self._erro(
-            "Erro: Saldo insuficiente na conta de origem.",
-            "SALDO_INSUFICIENTE",
+            "Erro: Saldo insuficiente  na conta de origem.",
+            "SALDO_INSUFICIENTE,
         )
 
     def criar_poupanca(self, numero, saldo_inicial):

@@ -132,9 +132,9 @@ class ContaService:
 
         if conta_origem.sacar(valor):
             if hasattr(conta_destino, "receber_transferencia"):
-                conta_destino.receber_transferencia(valor+10)
+                conta_destino.receber_transferencia(valor)
             else:
-                conta_destino.depositar(valor + 10)
+                conta_destino.depositar(valor)
 
             return self._sucesso(
                 "Transferencia realizada com sucesso.",
